@@ -70,6 +70,8 @@
     display: flex;
     flex-direction: column;
     height: calc(100vh - 5rem);
+    
+
   }
 
   .product-list-section h2 {
@@ -106,6 +108,24 @@
     flex-grow: 1;
     overflow-y: auto;
     padding-right: 5px;
+        &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      border: 2px solid transparent;
+    }
+
+    &::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
   }
   
 

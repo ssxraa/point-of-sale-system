@@ -110,7 +110,7 @@
     background: rgb(44, 44, 44, 0.5);
     backdrop-filter: blur(10px) saturate(180%);
     -webkit-backdrop-filter: blur(10px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.092);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: #fff;
     border-radius: 40px;
     padding: 1.5rem;
@@ -134,7 +134,7 @@
     border: #e0e0e0 1px solid;
     padding: 0.8rem 1rem;
     margin-bottom: 1.5rem;
-    border: none;
+    border: 1px solid rgba(255, 255, 255, 0.092);
     border-radius: 40px;
     font-size: 1rem;
     box-sizing: border-box;
@@ -148,6 +148,24 @@
     flex-grow: 1;
     overflow-y: auto;
     padding-right: 5px;
+        &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      border: 2px solid transparent;
+    }
+
+    &::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(255, 255, 255, 0.4);
+    }
   }
 
   .cart-item {
@@ -158,6 +176,7 @@
     padding: 0.75rem 0;
     border-bottom: 1px dashed #eee;
     font-size: 0.95rem;
+    
   }
 
   .cart-item:last-child {
@@ -174,7 +193,7 @@
   .item-price {
     text-align: right;
     font-weight: bold;
-    color: #88e69e;
+    color: #ffffff;
   }
   .item-actions {
     display: flex;
@@ -227,7 +246,7 @@
   }
   .summary-line span:last-child {
     font-weight: bold;
-    color: #28a745;
+    color: #ffffff;
   }
   .total-line {
     font-size: 1.3rem;
@@ -240,7 +259,8 @@
   .checkout-btn {
     width: 100%;
     padding: 1rem;
-    background-color: #28a745;
+    background-color: #A020F0;
+    box-shadow: 0 4px 15px rgba(160, 32, 240, 0.4);
     color: #fff;
     border: none;
     border-radius: 40px;
@@ -249,9 +269,12 @@
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
     margin-top: 1.5rem;
+    font-family: 'goia regular';
   }
   .checkout-btn:hover {
-     background-color: #4ac366;
+    background-color: #8a00d9;
+    border-color: #a020f0;
+    box-shadow: 0 4px 20px rgba(160, 32, 240, 0.6);
   }
 
   /* Modal Styles */
@@ -269,7 +292,7 @@
   }
 
   .modal-content {
-    background-color: rgb(44, 44, 44, 0.7);
+    background-color: rgb(44, 44, 44, 0.5);
     backdrop-filter: blur(10px) saturate(180%);
     -webkit-backdrop-filter: blur(10px) saturate(180%);
     padding: 2rem;
@@ -289,7 +312,7 @@
   .modal-total {
     font-size: 2rem;
     font-weight: bold;
-    color: #28a745;
+    color: #ffffff;
     margin-top: 0.5rem;
     display: block;
   }
@@ -309,22 +332,29 @@
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    font-family: 'goia regular';
   }
 
   .modal-actions button:first-child {
-    background-color: #28a745;
+    background-color: #A020F0;
+    box-shadow: 0 4px 15px rgba(160, 32, 240, 0.4);
     color: #fff;
   }
   .modal-actions button:first-child:hover {
-    background-color: #218838;
+    background-color: #8a00d9;
+    border-color: #a020f0;
+    box-shadow: 0 4px 20px rgba(160, 32, 240, 0.6);
   }
 
   .modal-actions button:nth-child(2) {
-    background-color: #28a745;
+    background-color: #A020F0;
+    box-shadow: 0 4px 15px rgba(160, 32, 240, 0.4);
     color: #fff;
   }
   .modal-actions button:nth-child(2):hover {
-    background-color: #218838;
+    background-color: #8a00d9;
+    border-color: #a020f0;
+    box-shadow: 0 4px 20px rgba(160, 32, 240, 0.6);
   }
 
   .modal-actions .cancel-btn {

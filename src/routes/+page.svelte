@@ -1,47 +1,73 @@
-<script>
+<script lang="ts">
+  import { goto } from '$app/navigation';
   import { invoke } from "@tauri-apps/api/core";
 
-  let name = $state("");
-  let greetMsg = $state("");
+  // New states for our login form, darling!
+  let username = $state('');
+  let password = $state('');
+  let loginError = $state('');
+  let isLoading = $state(false);
 
-  async function greet(event) {
-    event.preventDefault();
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsg = await invoke("greet", { name });
+  async function handleLogin(event: Event) {
+    event.preventDefault(); // Stop the form from reloading the page
+    loginError = ''; // Clear any past errors, let's keep it fresh!
+    isLoading = true; // Show that we're working our magic
+
+    if (username === 'admin' && password === 'slay') {
+      console.log('Login successful! Redirecting to the main POS area...');
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      goto('/pos');
+    } else {
+      loginError = 'Invalid username or password, darling! Try again! 😩';
+      console.log('Login failed:', loginError);
+    }
+
+    isLoading = false; // Done loading, queen!
   }
 </script>
 
 <main class="container">
-  <h1>Welcome to Tauri + Svelte</h1>
 
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://kit.svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte-kit" alt="SvelteKit Logo" />
-    </a>
-  </div>
-  <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
+  <form class="login-form" onsubmit={handleLogin}>
+    <h1 class="login-title">POS System Login</h1>
+    <div class="input-group">
+      <label for="username">Username</label>
+      <input
+        id="username"
+        type="text"
+        placeholder="Enter your username..."
+        bind:value={username}
+        required
+      />
+    </div>
 
-  <form class="row" onsubmit={greet}>
-    <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
-    <button type="submit">Greet</button>
+    <div class="input-group">
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        placeholder="Enter your password..."
+        bind:value={password}
+        required
+      />
+    </div>
+
+    {#if loginError}
+      <p class="error-message">{loginError}</p>
+    {/if}
+
+    <button type="submit" disabled={isLoading}>
+      {#if isLoading}
+        Logging in... 💅
+      {:else}
+        Login!
+      {/if}
+    </button>
   </form>
-  <p>{greetMsg}</p>
 </main>
 
 <style>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.svelte-kit:hover {
-  filter: drop-shadow(0 0 2em #ff3e00);
-}
 
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
@@ -50,7 +76,7 @@
   font-weight: 400;
 
   color: #0f0f0f;
-  background-color: #f6f6f6;
+  background-color: #f6f6f6; /* This will be overridden by dark mode bg-image */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -61,38 +87,15 @@
 
 .container {
   margin: 0;
-  padding-top: 10vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   text-align: center;
+  min-height: 90vh;
+  overflow-y: hidden;
+  padding-right: calc(67px + 2rem);
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
-}
-
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
 
 h1 {
   text-align: center;
@@ -112,47 +115,130 @@ button {
   box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
 }
 
-button {
+button { /* Keeping this style */
   cursor: pointer;
 }
 
-button:hover {
+button:hover { /* Keeping this style */
   border-color: #396cd8;
 }
-button:active {
+button:active { /* Keeping this style */
   border-color: #396cd8;
   background-color: #e8e8e8;
 }
 
 input,
-button {
+button { /* Keeping this style */
   outline: none;
 }
 
-#greet-input {
-  margin-right: 5px;
-}
 
 @media (prefers-color-scheme: dark) {
   :root {
     color: #f6f6f6;
-    background-image: url("/bg2.jpg");
-    background-repeat: no-repeat; 
+    background-image: url("/bg1.jpg"); /* This is your beautiful login background! */
+    background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
   }
-  a:hover {
-    color: #24c8db;
-  }
+
 
   input,
   button {
     color: #ffffff;
-    background-color: #0f0f0f98;
+    background-color: #0f0f0f98; /* Glassy input/button background in dark mode */
   }
   button:active {
     background-color: #0f0f0f69;
   }
 }
+/* --- Original Styles End Here --- */
 
+
+
+  .login-title {
+    font-size: 2em; /* A bit larger for the main title */
+    margin-bottom: 1.5rem; /* Space below the title */
+  }
+
+  .login-form {
+    /* This creates the distinct login box with glassy effect */
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Space between input groups and button */
+    align-items: stretch; /* Stretch items to fill the form's width */
+    max-width: 400px; /* Limit the width of the login form itself */
+    width: 100%; /* Make it responsive within max-width */
+    margin: 0 auto; /* Center the form horizontally within the container */
+    padding: 2.5rem; /* Internal padding for the login box */
+    border-radius: 40px; /* Slay-worthy rounded corners for the login box */
+    background: rgba(44, 44, 44, 0.5); /* Glassy background */
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box; /* Include padding in width */
+  }
+
+  .input-group {
+    width: 100%; /* Ensure it takes full width of the form */
+    text-align: left; /* Align label and potentially input text left */
+  }
+
+  .input-group label {
+    display: block; /* Make label take its own line */
+    margin-bottom: 0.5rem; /* Space between label and input */
+    font-size: 1rem;
+    color: #ccc; /* Lighter color for labels */
+    font-weight: 500;
+  }
+
+  /* Specific input styles for the login form to override defaults if needed */
+  input { /* This targets ALL inputs, but your original input styles are already very good. */
+    /* Just ensuring it takes full width and has correct padding/border-radius for login */
+    width: 100%;
+    border-radius: 40px; /* More rounded inputs for login vibe */
+    box-sizing: border-box; /* Crucial for width calculation */
+    /* Other styles inherited from your existing 'input' rule and dark mode */
+  }
+
+  input:focus {
+    border-color: #ffffff;
+  }
+
+  /* Specific button styles for the login form to override defaults */
+  button[type="submit"] { /* Targeting the submit button specifically for login look */
+    /* Overrides the default button colors with your signature purple */
+    background-color: #A020F0;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(160, 32, 240, 0.4); /* Stronger glow */
+    border-color: transparent; /* Ensure no default border shows initially */
+    border-radius: 40px; /* More rounded button for login vibe */
+    padding: 0.8em 1.5em; /* Ensure generous padding */
+    margin-top: 1rem;
+  }
+
+  button[type="submit"]:hover {
+    background-color: #8a00d9;
+    border-color: #a020f0;
+    box-shadow: 0 4px 20px rgba(160, 32, 240, 0.6);
+  }
+  button[type="submit"]:active {
+    background-color: #6a00a0;
+  }
+
+  button[type="submit"]:disabled {
+    background-color: rgba(160, 32, 240, 0.4);
+    cursor: not-allowed;
+    box-shadow: none;
+    border-color: transparent;
+  }
+
+  .error-message {
+    color: #ff6347; /* Tomato red for errors, visually striking! */
+    font-size: 0.9em;
+    margin-top: -0.5rem; /* Pull it closer to the input */
+    margin-bottom: 1rem;
+    text-align: center; /* Center the error message */
+  }
 </style>

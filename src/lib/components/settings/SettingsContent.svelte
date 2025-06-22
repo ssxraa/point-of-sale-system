@@ -13,7 +13,7 @@
     </div>
     <div class="setting-item">
       <label for="store-address">Address:</label>
-      <textarea id="store-address" rows="3" placeholder="123 Slay Street, City, Country"></textarea>
+      <input type="text" id="store-name" placeholder="123 Slay Street, City, Country" />
     </div>
     <div class="setting-item">
       <label for="store-phone">Phone:</label>
@@ -150,6 +150,7 @@
     margin-bottom: 1rem;
   }
 
+
   .setting-item label {
     font-size: 0.95rem;
     color: #ccc;
@@ -160,12 +161,11 @@
   .setting-item input[type="text"],
   .setting-item input[type="tel"],
   .setting-item input[type="email"],
-  .setting-item textarea,
   .setting-item select {
     width: 97%;
     padding: 0.8rem 1rem;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
+    border-radius: 40px;
     background-color: rgba(0, 0, 0, 0.3);
     color: #fff;
     font-size: 1rem;
@@ -173,22 +173,16 @@
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .setting-item input::placeholder,
-  .setting-item textarea::placeholder {
+  .setting-item input::placeholder {
     color: rgba(255, 255, 255, 0.5);
     font-family: "goia regular";
   }
 
   .setting-item input:focus,
-  .setting-item textarea:focus,
   .setting-item select:focus {
     border-color: #ffffff;
   }
 
-  .setting-item textarea {
-    resize: none;
-    width: auto;
-  }
 
   .setting-item select {
     appearance: none;
@@ -198,6 +192,7 @@
     background-position: right 0.7rem center;
     background-size: 1.2em auto;
     cursor: pointer;
+    width: auto;
   }
 
   .checkbox-item {
@@ -212,6 +207,9 @@
   }
 
   .action-button {
+    background-color: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     padding: 0.8rem 1.5rem;
     margin-bottom: 0.5rem;
     border: none;
@@ -223,22 +221,8 @@
     font-family: "goia regular";
   }
 
-  .action-button.primary {
-    background-color: #A020F0;
-    color: #fff;
-  }
 
-  .action-button.primary:hover {
-    background-color: #8A2BE2;
-  }
-
-  .action-button.secondary {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  .action-button.secondary:hover {
+  .action-button:hover {
     background-color: rgba(255, 255, 255, 0.2);
   }
 
@@ -247,7 +231,8 @@
     width: fit-content;
     margin: 2rem auto 0;
     padding: 1rem 3rem;
-    background-color: #28a745;
+    background-color: #A020F0;
+    box-shadow: 0 4px 15px rgba(160, 32, 240, 0.4);
     color: #fff;
     border: none;
     border-radius: 40px;
@@ -260,8 +245,8 @@
   }
 
   .save-button:hover {
-    background-color: rgb(40, 167, 69, 0.5);
-    backdrop-filter: blur(7px); 
-    -webkit-backdrop-filter: blur(7px);
+    background-color: #8a00d9;
+    border-color: #a020f0;
+    box-shadow: 0 4px 20px rgba(160, 32, 240, 0.6);
   }
 </style>

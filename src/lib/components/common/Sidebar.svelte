@@ -11,7 +11,6 @@ import FaTh from 'svelte-icons/fa/FaTh.svelte';
 <aside class="sidebar">
   <nav>
     <ul>
-      <li><a href="/" class:active={page.url.pathname === '/'}><FaHome /></a></li>
       <li><a href="/pos" class:active={page.url.pathname.startsWith('/pos')}> <FaShoppingCart /> </a></li>
       <li><a href="/inventory" class:active={page.url.pathname.startsWith('/inventory')}><FaBoxOpen /></a></li>
       <li><a href="/reports" class:active={page.url.pathname.startsWith('/reports')}><FaChartLine /></a></li>
