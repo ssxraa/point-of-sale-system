@@ -2,12 +2,12 @@
   import { onMount } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
 
-  // Types for clarity
+  // Types for clarity - REVERTED to original structure
   type SalesTransaction = {
     id: string;
     date: string;
     totalPaid: number;
-    items: string[];
+    items: string[]; // Still present, but will be empty from backend for performance
   };
   type ProductPerformance = {
     id: string;
@@ -16,13 +16,14 @@
     revenue: number;
     stock: number;
   };
+  // REVERTED RevenueOverview type
   type RevenueOverview = {
     daily: number;
     weekly: number;
     monthly: number;
   };
 
-  // State variables
+  // State variables - REVERTED to original structure
   let salesTransactions: SalesTransaction[] = [];
   let allProducts: ProductPerformance[] = [];
   let lowStockProducts: ProductPerformance[] = [];
@@ -45,6 +46,7 @@
     errorMsg = "";
     try {
       // Fetch sales, products, low stock, revenue
+      // Destructure the original fields from the RevenueOverview object
       [salesTransactions, allProducts, lowStockProducts, { daily, weekly, monthly }] = await Promise.all([
         invoke<SalesTransaction[]>("get_sales_transactions"),
         invoke<ProductPerformance[]>("get_product_performance"),
@@ -54,8 +56,9 @@
       dailyRevenue = daily;
       weeklyRevenue = weekly;
       monthlyRevenue = monthly;
-    } catch (err) {
-      errorMsg = "Failed to load report data.";
+    } catch (err: any) { // Catch as any to access err.message
+      errorMsg = `Failed to load report data: ${err.message || JSON.stringify(err)}`;
+      console.error("Error loading reports:", err);
     }
     loading = false;
   }
@@ -77,7 +80,7 @@
     if (productSearchTerm) {
       filteredProducts = allProducts.filter(product =>
         product.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
-        product.id.toLowerCase().includes(productSearchTerm) ||
+        String(product.id).toLowerCase().includes(productSearchTerm.toLowerCase()) || // Ensure ID search is robust
         String(product.salesCount).includes(productSearchTerm) ||
         String(product.revenue).includes(productSearchTerm) ||
         String(product.stock).includes(productSearchTerm)
@@ -94,10 +97,10 @@
   <h1 class="page-title">Reports Dashboard</h1>
 
   {#if loading}
-    <p>Loading reports...</p>
+    <p>Loading reports...💅</p>
   {:else}
     {#if errorMsg}
-      <p style="color: red;">{errorMsg}</p>
+      <p style="color: red; font-weight: bold;">{errorMsg}</p>
     {/if}
 
     <section class="reports-section sales-history-section">
@@ -115,9 +118,9 @@
             <h3>ID: {transaction.id}</h3>
             <p class="transaction-date">Date: {transaction.date}</p>
             <p class="transaction-total">Total: ${transaction.totalPaid.toFixed(2)}</p>
-          </div>
+            </div>
         {:else}
-          <p class="no-results">No transactions found, bestie!</p>
+          <p class="no-results">No transactions found, bestie! 😩</p>
         {/each}
       </div>
     </section>
@@ -137,7 +140,7 @@
           <h3>Monthly Revenue</h3>
           <p class="revenue-amount">${monthlyRevenue.toFixed(2)}</p>
         </div>
-      </div>
+        </div>
     </section>
 
     <section class="reports-section product-performance-section">

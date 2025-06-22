@@ -8,7 +8,7 @@ pub struct SalesTransaction {
     pub id: i64,
     pub date: String,
     pub total_paid: f64,
-    pub items: Vec<String>,
+    pub items: Vec<String>, // Keep this for now, but we'll populate it simply for performance
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -20,6 +20,7 @@ pub struct ProductPerformance {
     pub stock: u32,
 }
 
+// REVERTED: Back to original structure, no 'daily_last_month' or 'yearly'
 #[derive(Serialize, Deserialize, Clone)]
 pub struct RevenueOverview {
     pub daily: f64,
@@ -38,11 +39,12 @@ pub fn get_sales_transactions(db: State<DbConn>) -> Result<Vec<SalesTransaction>
     let mut transactions = Vec::new();
     for sale in sales_iter {
         let (id, date, total_paid) = sale.map_err(|e| e.to_string())?;
-        let mut items_stmt = conn.prepare(
-            "SELECT p.name FROM sale_items si JOIN products p ON si.product_id = p.id WHERE si.sale_id = ?"
-        ).map_err(|e| e.to_string())?;
-        let items_iter = items_stmt.query_map(params![id], |row| row.get::<_, String>(0)).map_err(|e| e.to_string())?;
-        let items: Vec<String> = items_iter.map(|x| x.unwrap_or_default()).collect();
+
+        // CRITICAL FIX RETAINED: For now, return an empty Vec<String> for items.
+        // This *significantly* improves performance by removing the N+1 query problem.
+        // The frontend reports UI doesn't use these names on the main card.
+        let items: Vec<String> = Vec::new();
+
         transactions.push(SalesTransaction { id, date, total_paid, items });
     }
     Ok(transactions)
@@ -53,8 +55,8 @@ pub fn get_product_performance(db: State<DbConn>) -> Result<Vec<ProductPerforman
     let conn = db.conn().lock().unwrap();
     let mut stmt = conn.prepare(
         "
-        SELECT p.id, p.name, 
-            COALESCE(SUM(si.quantity), 0) AS sales_count, 
+        SELECT p.id, p.name,
+            COALESCE(SUM(si.quantity), 0) AS sales_count,
             COALESCE(SUM(si.quantity * si.price), 0) AS revenue,
             p.stock
         FROM products p
@@ -82,8 +84,8 @@ pub fn get_low_stock_products(db: State<DbConn>) -> Result<Vec<ProductPerformanc
     let conn = db.conn().lock().unwrap();
     let mut stmt = conn.prepare(
         "
-        SELECT p.id, p.name, 
-            COALESCE(SUM(si.quantity), 0) AS sales_count, 
+        SELECT p.id, p.name,
+            COALESCE(SUM(si.quantity), 0) AS sales_count,
             COALESCE(SUM(si.quantity * si.price), 0) AS revenue,
             p.stock
         FROM products p
@@ -107,6 +109,7 @@ pub fn get_low_stock_products(db: State<DbConn>) -> Result<Vec<ProductPerformanc
     items.map_err(|e| e.to_string())
 }
 
+// REVERTED: Back to original implementation for revenue overview
 #[tauri::command]
 pub fn get_revenue_overview(db: State<DbConn>) -> Result<RevenueOverview, String> {
     let conn = db.conn().lock().unwrap();
@@ -125,5 +128,6 @@ pub fn get_revenue_overview(db: State<DbConn>) -> Result<RevenueOverview, String
         [],
         |row| row.get(0)
     ).unwrap_or(0.0);
+
     Ok(RevenueOverview { daily, weekly, monthly })
 }
