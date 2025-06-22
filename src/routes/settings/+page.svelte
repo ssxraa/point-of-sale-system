@@ -15,5 +15,4 @@
     overflow: hidden; 
   }
 
-  /* No other styles are needed here, as the SettingsContent component handles its own styling. */
 </style>

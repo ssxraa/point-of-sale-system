@@ -1,25 +1,31 @@
-<script>
-  // ✨✨✨ PROPS SLAY ✨✨✨
-  export let cart = []; // Shopping cart data passed from parent
-  export let handleBarcodeScan; // Pass the barcode scan handler as a prop
+<script lang="ts">
+  import { createEventDispatcher } from 'svelte';
 
-  // --- CALCULATED VALUES (REACTIVE) ---
+  // Define a type for a cart item that matches what your Rust backend expects
+  // Assuming 'id' comes as a number (i64 in Rust maps to number in JS/TS)
+  export type CartItem = {
+    id: number;
+    name: string;
+    price: number;
+    quantity: number;
+  };
+
+  export let cart: CartItem[] = [];
+  export let handleBarcodeScan: (event: Event) => void;
+
   $: subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  $: taxes = subtotal * 0.08; // Example 8% tax
+  $: taxes = subtotal * 0.08;
   $: total = subtotal + taxes;
 
-  // ✨✨✨ SVELTE EVENT DISPATCHER SLAY ✨✨✨
-  import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
 
-  // These functions will dispatch events back to the parent to modify the cart
-  function emitAddToCart(item) {
+  function emitAddToCart(item: CartItem) {
     dispatch('itemAdded', item);
   }
-  function emitRemoveFromCart(productId) {
+  function emitRemoveFromCart(productId: number) { // Changed to number
     dispatch('itemRemoved', productId);
   }
-  function emitDecreaseQuantity(productId) {
+  function emitDecreaseQuantity(productId: number) { // Changed to number
     dispatch('quantityDecreased', productId);
   }
 
@@ -30,13 +36,19 @@
       alert('Your cart is empty, bestie! Add some items first! 🛒');
       return;
     }
+    // Instead of just showing modal, now we dispatch the request to the parent (+page.svelte)
+    // The parent will then handle the backend call and decide to show the modal or print.
+    // We will now show the modal directly from this component anymore unless the parent confirms checkout
     showCheckoutModal = true;
   }
 
   function confirmCheckout() {
-    alert('Checkout finalized! Slay! 🎉'); // In a real app, this sends data to backend
-    showCheckoutModal = false;
-    dispatch('checkoutFinalized'); // Tell parent to clear cart
+    // This function will now dispatch the cart data to the parent for backend processing
+    // It will be called from within the modal's confirm button
+    dispatch('requestCheckout', cart); // NEW: Dispatch 'requestCheckout' with the entire cart
+    showCheckoutModal = false; // Close the modal
+    // The actual cart clearing (dispatch('checkoutFinalized')) will be handled by the parent
+    // AFTER the backend call is successful and potentially after printing.
   }
 
   function cancelCheckout() {
@@ -44,9 +56,12 @@
   }
 
   function printReceipt() {
-    alert('Printing receipt... 🖨️'); // In a real app, this triggers printing logic
-    window.print(); // Basic browser print dialog
-    confirmCheckout(); // Finalize after print
+    // This function should be called by the parent after backend checkout and data processing
+    // For now, it will trigger the print directly from the modal, but the actual printing logic
+    // is in pos/+page.svelte after the backend call.
+    alert('Printing receipt... 🖨️');
+    window.print(); // This triggers browser print dialog, not the Tauri backend command
+    confirmCheckout(); // Still confirm the checkout after printing
   }
 </script>
 

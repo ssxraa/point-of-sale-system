@@ -1,16 +1,5 @@
-<script>
-  // Mock data for now - later this will come from backend or props
-  let products = [
-    { id: '1234567890128', name: 'yummy chocolate', price: 12.99, stock: 50 },
-    { id: '1234567890135', name: 'booty shorts', price: 8.50, stock: 120 },
-    { id: '1234567890142', name: 'bikini tops', price: 299.99, stock: 5 },
-    { id: '1234567890159', name: 'my ass', price: 1313.00, stock: 1 },
-    { id: '1234567890166', name: 'uwu', price: 9.99, stock: 87 },
-    { id: '1234567890173', name: 'cereals', price: 35.50, stock: 20 },
-    { id: '1234567890180', name: 'coffee machine', price: 870.00, stock: 100 },
-    { id: '1234567890197', name: 'nothing (we take your money)', price: 25.00, stock: 40 },
-  ];
-
+<script lang="ts">
+  export let products = []; // Must be passed in by parent
   let searchTerm = '';
   let filteredProducts = products;
 
@@ -25,12 +14,10 @@
     }
   }
 
-  // ✨✨✨ SVELTE EVENT DISPATCHER SLAY ✨✨✨
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
 
   function selectProduct(product) {
-    // When a product is clicked, we dispatch an event to the parent
     dispatch('productSelected', product);
   }
 </script>
@@ -58,9 +45,6 @@
 </section>
 
 <style>
-  /* Copy all relevant CSS from .product-list-section, .search-bar,
-     .product-grid, .product-card, .no-results from your +page.svelte */
-
   .product-list-section {
     background: none;
     color: #fff;

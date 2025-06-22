@@ -1,5 +1,4 @@
 <script lang="ts">
-
   let itemName: string = '';
   let itemPrice: number | null = null; 
   let itemStock: number | null = null; 
@@ -54,7 +53,6 @@
             placeholder="E.g., Sparkling Water"
             bind:value={itemName}
             required
-            
           />
         </div>
 

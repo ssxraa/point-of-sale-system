@@ -2,34 +2,35 @@
   import { goto } from '$app/navigation';
   import { invoke } from "@tauri-apps/api/core";
 
-  // New states for our login form, darling!
-  let username = $state('');
-  let password = $state('');
-  let loginError = $state('');
-  let isLoading = $state(false);
+  let username = '';
+  let password = '';
+  let loginError = '';
+  let isLoading = false;
 
   async function handleLogin(event: Event) {
-    event.preventDefault(); // Stop the form from reloading the page
-    loginError = ''; // Clear any past errors, let's keep it fresh!
-    isLoading = true; // Show that we're working our magic
+    event.preventDefault();
+    loginError = '';
+    isLoading = true;
 
-    if (username === 'admin' && password === 'slay') {
-      console.log('Login successful! Redirecting to the main POS area...');
-
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      goto('/pos');
-    } else {
-      loginError = 'Invalid username or password, darling! Try again! 😩';
-      console.log('Login failed:', loginError);
+    try {
+      // Call Rust backend for login
+      const isValid = await invoke<boolean>('login', { username, password });
+      if (isValid) {
+        goto('/pos');
+      } else {
+        loginError = "Invalid username or password.";
+      }
+    } catch (err) {
+      loginError = "Login failed. Please try again!";
+      console.log('Login failed:', err);
     }
 
-    isLoading = false; // Done loading, queen!
+    isLoading = false;
   }
 </script>
 
 <main class="container">
-
-  <form class="login-form" onsubmit={handleLogin}>
+  <form class="login-form" on:submit={handleLogin}>
     <h1 class="login-title">POS System Login</h1>
     <div class="input-group">
       <label for="username">Username</label>

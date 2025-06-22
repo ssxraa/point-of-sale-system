@@ -1,180 +1,181 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { onMount } from "svelte";
+  import { invoke } from "@tauri-apps/api/core";
 
-  let salesTransactions = [
-    { id: 'TRN001', date: '2025-06-15', totalPaid: 150.75, items: ['yummy chocolate', 'bikini tops'] },
-    { id: 'TRN002', date: '2025-06-15', totalPaid: 25.00, items: ['cereals'] },
-    { id: 'TRN003', date: '2025-06-14', totalPaid: 1313.00, items: ['my ass'] },
-    { id: 'TRN004', date: '2025-06-14', totalPaid: 870.00, items: ['coffee machine'] },
-    { id: 'TRN005', date: '2025-06-13', totalPaid: 9.99, items: ['uwu'] },
-    { id: 'TRN006', date: '2025-06-13', totalPaid: 299.99, items: ['bikini tops'] },
-    { id: 'TRN007', date: '2025-06-12', totalPaid: 12.99, items: ['yummy chocolate'] },
-    { id: 'TRN008', date: '2025-06-12', totalPaid: 35.50, items: ['cereals'] },
-    { id: 'TRN009', date: '2025-06-11', totalPaid: 18.25, items: ['milk frother'] },
-    { id: 'TRN010', date: '2025-06-11', totalPaid: 50.00, items: ['bag of cookies'] },
-    { id: 'TRN011', date: '2025-06-10', totalPaid: 12.99, items: ['pastry assortment'] },
-    { id: 'TRN012', date: '2025-06-09', totalPaid: 8.50, items: ['organic green tea'] },
-    { id: 'TRN013', date: '2025-06-09', totalPaid: 299.99, items: ['espresso machine'] },
-    { id: 'TRN014', date: '2025-06-08', totalPaid: 5.00, items: ['ceramic mug'] },
-    { id: 'TRN015', date: '2025-06-08', totalPaid: 35.50, items: ['deluxe coffee blend'] },
-  ];
+  // Types for clarity
+  type SalesTransaction = {
+    id: string;
+    date: string;
+    totalPaid: number;
+    items: string[];
+  };
+  type ProductPerformance = {
+    id: string;
+    name: string;
+    salesCount: number;
+    revenue: number;
+    stock: number;
+  };
+  type RevenueOverview = {
+    daily: number;
+    weekly: number;
+    monthly: number;
+  };
 
-  // ✨ MOCK DATA SLAY for Product Performance & Low Stock ✨
-  let allProducts = [
-    { id: 'PROD001', name: 'Deluxe Coffee Blend', salesCount: 250, revenue: 3247.50, stock: 50 },
-    { id: 'PROD002', name: 'Organic Green Tea (Box)', salesCount: 180, revenue: 1530.00, stock: 120 },
-    { id: 'PROD003', name: 'Espresso Machine', salesCount: 15, revenue: 4499.85, stock: 5 }, // Low stock!
-    { id: 'PROD004', name: 'Pastry Assortment', salesCount: 300, revenue: 1500.00, stock: 30 },
-    { id: 'PROD005', name: 'Ceramic Mug (Large)', salesCount: 200, revenue: 1998.00, stock: 75 },
-    { id: 'PROD006', name: 'Milk Frother', salesCount: 50, revenue: 1775.00, stock: 20 },
-    { id: 'PROD007', name: 'Bag of Cookies', salesCount: 10, revenue: 32.50, stock: 4 }, // Low stock!
-    { id: 'PROD008', name: 'Gift Card ($25)', salesCount: 100, revenue: 2500.00, stock: 150 },
-    { id: 'PROD009', name: 'Hand Sanitizer', salesCount: 5, revenue: 25.00, stock: 3 },
-    { id: 'PROD010', name: 'Hand Sanitizer (', salesCount: 5, revenue: 25.00, stock: 3 },
-    { id: 'PROD011', name: 'Hand Sanitize', salesCount: 5, revenue: 25.00, stock: 3 },
-    { id: 'PROD012', name: 'Hand Sanitizer (La', salesCount: 5, revenue: 25.00, stock: 3 },
-    { id: 'PROD013', name: 'Hand Sanitizer (Lar', salesCount: 5, revenue: 25.00, stock: 3 },
-    { id: 'PROD014', name: 'Hand Sanitizer (Large', salesCount: 5, revenue: 25.00, stock: 3 },
-  ];
+  // State variables
+  let salesTransactions: SalesTransaction[] = [];
+  let allProducts: ProductPerformance[] = [];
+  let lowStockProducts: ProductPerformance[] = [];
+  let dailyRevenue = 0;
+  let weeklyRevenue = 0;
+  let monthlyRevenue = 0;
 
   let transactionSearchTerm = '';
-  let filteredTransactions = salesTransactions;
+  let productSearchTerm = '';
 
+  let filteredTransactions: SalesTransaction[] = [];
+  let filteredProducts: ProductPerformance[] = [];
+
+  let loading = true;
+  let errorMsg = "";
+
+  // Load all report data from backend
+  async function loadReportsData() {
+    loading = true;
+    errorMsg = "";
+    try {
+      // Fetch sales, products, low stock, revenue
+      [salesTransactions, allProducts, lowStockProducts, { daily, weekly, monthly }] = await Promise.all([
+        invoke<SalesTransaction[]>("get_sales_transactions"),
+        invoke<ProductPerformance[]>("get_product_performance"),
+        invoke<ProductPerformance[]>("get_low_stock_products"),
+        invoke<RevenueOverview>("get_revenue_overview")
+      ]);
+      dailyRevenue = daily;
+      weeklyRevenue = weekly;
+      monthlyRevenue = monthly;
+    } catch (err) {
+      errorMsg = "Failed to load report data.";
+    }
+    loading = false;
+  }
+
+  // Filtered data reactively
   $: {
     if (transactionSearchTerm) {
       filteredTransactions = salesTransactions.filter(transaction =>
         transaction.id.toLowerCase().includes(transactionSearchTerm.toLowerCase()) ||
-        transaction.date.includes(transactionSearchTerm) || // Allow searching by date
-        String(transaction.totalPaid).includes(transactionSearchTerm) // Allow searching by total paid
+        transaction.date.includes(transactionSearchTerm) ||
+        String(transaction.totalPaid).includes(transactionSearchTerm)
       );
     } else {
       filteredTransactions = salesTransactions;
     }
   }
 
-  // ✨ NEW: Product Search Term and Filtered Products ✨
-  let productSearchTerm = '';
-  let filteredProducts = allProducts;
-
   $: {
     if (productSearchTerm) {
       filteredProducts = allProducts.filter(product =>
         product.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
-        product.id.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
+        product.id.toLowerCase().includes(productSearchTerm) ||
         String(product.salesCount).includes(productSearchTerm) ||
         String(product.revenue).includes(productSearchTerm) ||
         String(product.stock).includes(productSearchTerm)
-      ).sort((a, b) => b.salesCount - a.salesCount); // Keep sorting even with search
+      ).sort((a, b) => b.salesCount - a.salesCount);
     } else {
-      filteredProducts = allProducts.sort((a, b) => b.salesCount - a.salesCount);
+      filteredProducts = [...allProducts].sort((a, b) => b.salesCount - a.salesCount);
     }
   }
 
-  // Reactive calculations for Daily/Weekly/Monthly Revenue
-  let dailyRevenue = 0;
-  let weeklyRevenue = 0;
-  let monthlyRevenue = 0;
-
-  $: {
-    const today = new Date().toISOString().slice(0, 10); //YYYY-MM-DD
-    const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-    const oneMonthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10); // Approx. 30 days
-
-    dailyRevenue = salesTransactions
-      .filter(t => t.date === today)
-      .reduce((sum, t) => sum + t.totalPaid, 0);
-
-    weeklyRevenue = salesTransactions
-      .filter(t => t.date >= oneWeekAgo && t.date <= today)
-      .reduce((sum, t) => sum + t.totalPaid, 0);
-
-    monthlyRevenue = salesTransactions
-      .filter(t => t.date >= oneMonthAgo && t.date <= today)
-      .reduce((sum, t) => sum + t.totalPaid, 0);
-  }
-
-  // Low Stock Alerts (based on allProducts, not filteredProducts)
-  let lowStockProducts = allProducts.filter(p => p.stock < 5); // Below 5 as specified!
+  onMount(loadReportsData);
 </script>
 
 <div class="reports-container-glassy">
   <h1 class="page-title">Reports Dashboard</h1>
 
-  <section class="reports-section sales-history-section">
-    <h2 class="section-title">Sales History</h2>
-    <input
-      type="text"
-      placeholder="Search transactions by ID, date, or total..."
-      bind:value={transactionSearchTerm}
-      class="search-bar"
-    />
+  {#if loading}
+    <p>Loading reports...</p>
+  {:else}
+    {#if errorMsg}
+      <p style="color: red;">{errorMsg}</p>
+    {/if}
 
-    <div class="transaction-list product-grid">
-      {#each filteredTransactions as transaction (transaction.id)}
-        <div class="transaction-card product-card">
-          <h3>ID: {transaction.id}</h3>
-          <p class="transaction-date">Date: {transaction.date}</p>
-          <p class="transaction-total">Total: ${transaction.totalPaid.toFixed(2)}</p>
-        </div>
-      {:else}
-        <p class="no-results">No transactions found, bestie!</p>
-      {/each}
-    </div>
-  </section>
+    <section class="reports-section sales-history-section">
+      <h2 class="section-title">Sales History</h2>
+      <input
+        type="text"
+        placeholder="Search transactions by ID, date, or total..."
+        bind:value={transactionSearchTerm}
+        class="search-bar"
+      />
 
-  <section class="reports-section revenue-reports-section">
-    <h2 class="section-title">Revenue Overview</h2>
-    <div class="revenue-cards-grid">
-      <div class="revenue-card">
-        <h3>Daily Revenue</h3>
-        <p class="revenue-amount">${dailyRevenue.toFixed(2)}</p>
+      <div class="transaction-list product-grid">
+        {#each filteredTransactions as transaction (transaction.id)}
+          <div class="transaction-card product-card">
+            <h3>ID: {transaction.id}</h3>
+            <p class="transaction-date">Date: {transaction.date}</p>
+            <p class="transaction-total">Total: ${transaction.totalPaid.toFixed(2)}</p>
+          </div>
+        {:else}
+          <p class="no-results">No transactions found, bestie!</p>
+        {/each}
       </div>
-      <div class="revenue-card">
-        <h3>Weekly Revenue</h3>
-        <p class="revenue-amount">${weeklyRevenue.toFixed(2)}</p>
-      </div>
-      <div class="revenue-card">
-        <h3>Monthly Revenue</h3>
-        <p class="revenue-amount">${monthlyRevenue.toFixed(2)}</p>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="reports-section product-performance-section">
-    <h2 class="section-title">Product Performance</h2>
-    <input
-      type="text"
-      placeholder="Search products by name, ID, sales, or revenue..."
-      bind:value={productSearchTerm}
-      class="search-bar"
-    />
-    <div class="product-performance-list product-grid">
-      {#each filteredProducts as product (product.id)}
-        <div class="performance-card product-card">
-          <h3>{product.name}</h3>
-          <p>Sold: {product.salesCount}</p>
-          <p>Revenue: ${product.revenue.toFixed(2)}</p>
-          <p>Stock: {product.stock}</p>
+    <section class="reports-section revenue-reports-section">
+      <h2 class="section-title">Revenue Overview</h2>
+      <div class="revenue-cards-grid">
+        <div class="revenue-card">
+          <h3>Daily Revenue</h3>
+          <p class="revenue-amount">${dailyRevenue.toFixed(2)}</p>
         </div>
-      {:else}
-        <p class="no-results">No product data to display!</p>
-      {/each}
-    </div>
-  </section>
+        <div class="revenue-card">
+          <h3>Weekly Revenue</h3>
+          <p class="revenue-amount">${weeklyRevenue.toFixed(2)}</p>
+        </div>
+        <div class="revenue-card">
+          <h3>Monthly Revenue</h3>
+          <p class="revenue-amount">${monthlyRevenue.toFixed(2)}</p>
+        </div>
+      </div>
+    </section>
 
-  <section class="reports-section">
-    <h2 class="section-title">Low Stock Alerts</h2>
-    <div class="low-stock-list product-grid">
-      {#each lowStockProducts as product (product.id)}
-        <div class="low-stock-card product-card alert-card">
-          <h3>{product.name}</h3>
-          <p>Current Stock: {product.stock}</p>
-        </div>
-      {:else}
-        <p class="no-results">No low stock alerts! Everything's stocked up, bestie!</p>
-      {/each}
-    </div>
-  </section>
+    <section class="reports-section product-performance-section">
+      <h2 class="section-title">Product Performance</h2>
+      <input
+        type="text"
+        placeholder="Search products by name, ID, sales, or revenue..."
+        bind:value={productSearchTerm}
+        class="search-bar"
+      />
+      <div class="product-performance-list product-grid">
+        {#each filteredProducts as product (product.id)}
+          <div class="performance-card product-card">
+            <h3>{product.name}</h3>
+            <p>Sold: {product.salesCount}</p>
+            <p>Revenue: ${product.revenue.toFixed(2)}</p>
+            <p>Stock: {product.stock}</p>
+          </div>
+        {:else}
+          <p class="no-results">No product data to display!</p>
+        {/each}
+      </div>
+    </section>
+
+    <section class="reports-section">
+      <h2 class="section-title">Low Stock Alerts</h2>
+      <div class="low-stock-list product-grid">
+        {#each lowStockProducts as product (product.id)}
+          <div class="low-stock-card product-card alert-card">
+            <h3>{product.name}</h3>
+            <p>Current Stock: {product.stock}</p>
+          </div>
+        {:else}
+          <p class="no-results">No low stock alerts! Everything's stocked up, bestie!</p>
+        {/each}
+      </div>
+    </section>
+  {/if}
 </div>
 
 <style>

@@ -1,65 +1,80 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+  import { invoke } from "@tauri-apps/api/core";
   import ProductList from '$lib/components/pos/productlist.svelte';
-  import AddItemEditItemSection, { type Item } from '$lib/components/inventory//AddItemEditItemSection.svelte';
+  import AddItemEditItemSection, { type Item } from '$lib/components/inventory/AddItemEditItemSection.svelte';
 
-  // ✨ Mock Inventory Data ✨
-  // In a real app, this would come from your backend/database!
-  // We'll manage it here for now to demonstrate functionality.
-  let inventoryItems = $state<Item[]>([
-    { id: 'prod-001', name: 'Sparkling Water (Large)', price: 3.50, stock: 150 },
-    { id: 'prod-002', name: 'Organic Coffee Beans (250g)', price: 12.99, stock: 80 },
-    { id: 'prod-003', name: 'Artisanal Bread (Whole Wheat)', price: 4.25, stock: 30 },
-    { id: 'prod-004', name: 'Vegan Chocolate Bar', price: 5.00, stock: 120 },
-    { id: 'prod-005', name: 'Freshly Squeezed Orange Juice (1L)', price: 6.75, stock: 60 },
-  ]);
+  let inventoryItems: Item[] = [];
+  let selectedItemForEdit: Item | null = null;
+  let errorMessage = "";
+  let loading = true;
 
-  // State to hold the currently selected item for editing
-  let selectedItemForEdit: Item | null = $state(null);
-
-  // --- Event Handlers from ProductList ---
-  function handleProductSelect(event: CustomEvent<Item>) {
-    selectedItemForEdit = event.detail; // Set the selected item for the edit section
-    console.log('Selected item for edit:', selectedItemForEdit);
+  async function loadInventory() {
+    loading = true;
+    errorMessage = "";
+    try {
+      inventoryItems = await invoke<Item[]>("get_inventory");
+    } catch (err) {
+      errorMessage = "Failed to load inventory.";
+    }
+    loading = false;
   }
 
-  // --- Event Handlers from AddItemEditItemSection ---
-  function handleAddItem(event: CustomEvent<{ name: string; price: number; stock: number }>) {
-    const newItem = {
-      id: `prod-${Date.now()}-${Math.floor(Math.random() * 1000)}`, // Simple unique ID for mock data
-      ...event.detail
-    };
-    inventoryItems = [...inventoryItems, newItem]; // Add new item to the list
-    console.log('New item added:', newItem);
-    selectedItemForEdit = null; // Clear selection after adding
+  async function handleAddItem(event: CustomEvent<{ name: string; price: number; stock: number }>) {
+    try {
+      const newItem = await invoke<Item>("add_product", event.detail);
+      inventoryItems = [...inventoryItems, newItem];
+      selectedItemForEdit = null;
+    } catch (err) {
+      errorMessage = "Failed to add item.";
+    }
   }
 
-  function handleUpdateItem(event: CustomEvent<Item>) {
-    const updatedItem = event.detail;
-    inventoryItems = inventoryItems.map(item =>
-      item.id === updatedItem.id ? updatedItem : item
-    );
-    console.log('Item updated:', updatedItem);
-    selectedItemForEdit = null; // Clear selection after updating
+  async function handleUpdateItem(event: CustomEvent<Item>) {
+    try {
+      const updatedItem = await invoke<Item>("update_product", event.detail);
+      inventoryItems = inventoryItems.map(item =>
+        item.id === updatedItem.id ? updatedItem : item
+      );
+      selectedItemForEdit = null;
+    } catch (err) {
+      errorMessage = "Failed to update item.";
+    }
   }
 
-  function handleDeleteItem(event: CustomEvent<string>) {
-    const itemIdToDelete = event.detail;
-    inventoryItems = inventoryItems.filter(item => item.id !== itemIdToDelete);
-    console.log('Item deleted:', itemIdToDelete);
-    selectedItemForEdit = null; // Clear selection after deleting
+  async function handleDeleteItem(event: CustomEvent<string>) {
+    try {
+      await invoke("delete_product", { id: event.detail });
+      inventoryItems = inventoryItems.filter(item => item.id !== event.detail);
+      selectedItemForEdit = null;
+    } catch (err) {
+      errorMessage = "Failed to delete item.";
+    }
   }
 
   function handleClearSelection() {
-    selectedItemForEdit = null; // Clears the selection when AddItemEditItemSection requests it
-    console.log('Selection cleared.');
+    selectedItemForEdit = null;
   }
+
+  function handleProductSelect(event: CustomEvent<Item>) {
+    selectedItemForEdit = event.detail;
+  }
+
+  onMount(loadInventory);
 </script>
 
 <div class="inventory-page-layout">
+  {#if loading}
+    <p>Loading inventory...</p>
+  {:else}
+    {#if errorMessage}
+      <p style="color: red;">{errorMessage}</p>
+    {/if}
     <ProductList
       products={inventoryItems}
       on:productSelected={handleProductSelect}
-      showQuantityControls={false} />
+      showQuantityControls={false}
+    />
 
     <AddItemEditItemSection
       bind:selectedItem={selectedItemForEdit}
@@ -68,6 +83,7 @@
       on:deleteItem={handleDeleteItem}
       on:clearSelection={handleClearSelection}
     />
+  {/if}
 </div>
 
 <style>
