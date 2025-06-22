@@ -4,17 +4,17 @@
 
   // Types for clarity - REVERTED to original structure
   type SalesTransaction = {
-    id: string;
+    id: number;
     date: string;
-    totalPaid: number;
+    total_paid: number;
     items: string[]; // Still present, but will be empty from backend for performance
   };
   type ProductPerformance = {
-    id: string;
+    id: number;
     name: string;
-    salesCount: number;
-    revenue: number;
+    sales_count: number;
     stock: number;
+    revenue: number;
   };
   // REVERTED RevenueOverview type
   type RevenueOverview = {
@@ -40,36 +40,42 @@
   let loading = true;
   let errorMsg = "";
 
-  // Load all report data from backend
-  async function loadReportsData() {
+// ... (previous code)
+
+// Load all report data from backend
+async function loadReportsData() {
     loading = true;
     errorMsg = "";
     try {
-      // Fetch sales, products, low stock, revenue
-      // Destructure the original fields from the RevenueOverview object
-      [salesTransactions, allProducts, lowStockProducts, { daily, weekly, monthly }] = await Promise.all([
-        invoke<SalesTransaction[]>("get_sales_transactions"),
-        invoke<ProductPerformance[]>("get_product_performance"),
-        invoke<ProductPerformance[]>("get_low_stock_products"),
-        invoke<RevenueOverview>("get_revenue_overview")
-      ]);
-      dailyRevenue = daily;
-      weeklyRevenue = weekly;
-      monthlyRevenue = monthly;
+        const [sales, products, lowStock, revenueOverviewResult] = await Promise.all([
+            invoke<SalesTransaction[]>("get_sales_transactions"),
+            invoke<ProductPerformance[]>("get_product_performance"),
+            invoke<ProductPerformance[]>("get_low_stock_products"),
+            invoke<RevenueOverview>("get_revenue_overview")
+        ]);
+
+        salesTransactions = sales;
+        allProducts = products;
+        lowStockProducts = lowStock;
+
+        // Now, assign the properties from the received object to your state variables
+        dailyRevenue = revenueOverviewResult.daily;
+        weeklyRevenue = revenueOverviewResult.weekly;
+        monthlyRevenue = revenueOverviewResult.monthly;
+
     } catch (err: any) { // Catch as any to access err.message
-      errorMsg = `Failed to load report data: ${err.message || JSON.stringify(err)}`;
-      console.error("Error loading reports:", err);
+        errorMsg = `Failed to load report data: ${err.message || JSON.stringify(err)}`;
+        console.error("Error loading reports:", err);
     }
     loading = false;
-  }
+}
 
-  // Filtered data reactively
   $: {
     if (transactionSearchTerm) {
       filteredTransactions = salesTransactions.filter(transaction =>
         transaction.id.toLowerCase().includes(transactionSearchTerm.toLowerCase()) ||
         transaction.date.includes(transactionSearchTerm) ||
-        String(transaction.totalPaid).includes(transactionSearchTerm)
+        String(transaction.total_paid).includes(transactionSearchTerm)
       );
     } else {
       filteredTransactions = salesTransactions;
@@ -81,7 +87,7 @@
       filteredProducts = allProducts.filter(product =>
         product.name.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
         String(product.id).toLowerCase().includes(productSearchTerm.toLowerCase()) || // Ensure ID search is robust
-        String(product.salesCount).includes(productSearchTerm) ||
+        String(product.sales_count).includes(productSearchTerm) ||
         String(product.revenue).includes(productSearchTerm) ||
         String(product.stock).includes(productSearchTerm)
       ).sort((a, b) => b.salesCount - a.salesCount);
@@ -117,7 +123,7 @@
           <div class="transaction-card product-card">
             <h3>ID: {transaction.id}</h3>
             <p class="transaction-date">Date: {transaction.date}</p>
-            <p class="transaction-total">Total: ${transaction.totalPaid.toFixed(2)}</p>
+            <p class="transaction-total">Total: ${transaction.total_paid.toFixed(2)}</p>
             </div>
         {:else}
           <p class="no-results">No transactions found, bestie! 😩</p>
@@ -155,7 +161,7 @@
         {#each filteredProducts as product (product.id)}
           <div class="performance-card product-card">
             <h3>{product.name}</h3>
-            <p>Sold: {product.salesCount}</p>
+            <p>Sold: {product.sales_count}</p>
             <p>Revenue: ${product.revenue.toFixed(2)}</p>
             <p>Stock: {product.stock}</p>
           </div>
