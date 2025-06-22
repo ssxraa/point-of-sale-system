@@ -1,7 +1,5 @@
-# Tauri + SvelteKit
+# POS and stock management system built in svelte/rust/tauri
 
-This template should help get you started developing with Tauri and SvelteKit in Vite.
+a very simple pos system with that offers stock management, a checkout interface, a simple reports section, and some settings.
+local database in sqlite for storing information.
 
-## Recommended IDE Setup
-
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer).
