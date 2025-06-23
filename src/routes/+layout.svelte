@@ -18,7 +18,7 @@ main {
   margin-left: calc(67px + 2rem);
   margin-top: 1rem;
   margin-right: 1rem;
-  font-family: 'goia regular';
+  font-family: 'goia display regular';
 }
 
 

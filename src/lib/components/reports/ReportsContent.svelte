@@ -263,7 +263,7 @@ async function loadReportsData() {
     border-radius: 40px;
     font-size: 1rem;
     box-sizing: border-box;
-    font-family: 'goia regular', sans-serif; /* Added sans-serif fallback */
+    font-family: 'goia display regular'; /* Added sans-serif fallback */
     background-color: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.092); /* Base border */
     color: #fff;
@@ -273,7 +273,7 @@ async function loadReportsData() {
 
   .search-bar::placeholder {
     color: rgba(255, 255, 255, 0.5);
-    font-family: 'goia regular', sans-serif;
+    font-family: 'goia display regular';
   }
 
   .search-bar:focus {

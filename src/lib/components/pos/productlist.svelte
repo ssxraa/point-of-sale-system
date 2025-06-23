@@ -71,7 +71,7 @@
     border-radius: 40px;
     font-size: 1rem;
     box-sizing: border-box;
-    font-family: 'goia regular';
+    font-family: 'goia display regular';
     background: rgb(44, 44, 44, 0.5);
     backdrop-filter: blur(10px) saturate(180%);
     -webkit-backdrop-filter: blur(10px) saturate(180%);
@@ -80,7 +80,7 @@
   }
   .search-bar::placeholder {
     color: #ffffff;
-    font-family: 'goia regular';
+    font-family: 'goia display regular';
   }
 
   

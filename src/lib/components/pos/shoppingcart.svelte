@@ -284,7 +284,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
     margin-top: 1.5rem;
-    font-family: 'goia regular';
+    font-family: 'goia display regular';
   }
   .checkout-btn:hover {
     background-color: #8a00d9;
@@ -347,7 +347,7 @@
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    font-family: 'goia regular';
+    font-family: 'goia display regular';
   }
 
   .modal-actions button:first-child {

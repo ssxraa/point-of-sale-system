@@ -241,7 +241,7 @@
     justify-content: center;
     overflow-y: auto;
     overflow-x: hidden;
-    font-family: "goia regular";
+    font-family: "goia display regular";
 
     /* Glass effect */
     backdrop-filter: blur(10px) saturate(180%);
@@ -330,7 +330,7 @@
 
   .setting-item input::placeholder {
     color: rgba(255, 255, 255, 0.5);
-    font-family: "goia regular";
+    font-family: "goia display regular";
   }
 
   .setting-item input:focus,
@@ -373,7 +373,7 @@
     font-size: 1rem;
     font-weight: 600;
     transition: background-color 0.2s ease, transform 0.1s ease;
-    font-family: "goia regular";
+    font-family: "goia display regular";
   }
 
 
@@ -396,7 +396,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    font-family: "goia regular";
+    font-family: "goia display regular";
   }
 
   .save-button:hover {

@@ -1,6 +1,14 @@
 @font-face {
-  font-family: 'nunito';
-  src: url('/fonts/Nunito-Light.ttf') format('truetype');
+  font-family: 'goia regular';
+  src: url('/fonts/Goia-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'goia display regular';
+  src: url('/fonts/GoiaDisplay-Regular.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
