@@ -1,6 +1,7 @@
 <script>
   import Sidebar from '$lib/components/common/Sidebar.svelte';
   import { page } from '$app/stores';
+  import '../app.css';
   $: showSidebar = $page.url.pathname !== '/' ;
 </script>
 
@@ -18,7 +19,7 @@ main {
   margin-left: calc(67px + 2rem);
   margin-top: 1rem;
   margin-right: 1rem;
-  font-family: 'goia display regular';
+  font-family: 'boya';
 }
 
 

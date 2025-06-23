@@ -14,8 +14,7 @@
   export let handleBarcodeScan: (event: Event) => void;
 
   $: subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  $: taxes = subtotal * 0.08;
-  $: total = subtotal + taxes;
+  $: total = subtotal;
 
   const dispatch = createEventDispatcher();
 
@@ -81,7 +80,7 @@
         <div class="cart-item">
           <span class="item-name">{item.name}</span>
           <span class="item-qty">x{item.quantity}</span>
-          <span class="item-price">${(item.price * item.quantity).toFixed(2)}</span>
+          <span class="item-price">{(item.price * item.quantity).toFixed(2)}Da</span>
           <div class="item-actions">
             <button on:click={() => emitDecreaseQuantity(item.id)}>-</button>
             <button on:click={() => emitAddToCart(item)}>+</button>
@@ -92,9 +91,7 @@
     </div>
 
     <div class="cart-summary">
-      <div class="summary-line"><span>Subtotal:</span><span>${subtotal.toFixed(2)}</span></div>
-      <div class="summary-line"><span>Taxes:</span><span>${taxes.toFixed(2)}</span></div>
-      <div class="summary-line total-line"><span>Total:</span><span>${total.toFixed(2)}</span></div>
+      <div class="summary-line total-line"><span>Total:</span><span>{total.toFixed(2)}Da</span></div>
     </div>
 
     <button class="checkout-btn" on:click={finalizeCheckout}>Finalize Checkout</button>
@@ -246,7 +243,6 @@
   }
 
   .cart-summary {
-    border-top: 2px solid #f0f0f0;
     padding-top: 1rem;
     margin-top: 1rem;
   }
@@ -284,7 +280,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
     margin-top: 1.5rem;
-    font-family: 'goia display regular';
+    font-family: 'boya';
   }
   .checkout-btn:hover {
     background-color: #8a00d9;
@@ -347,7 +343,7 @@
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    font-family: 'goia display regular';
+    font-family: 'boya';
   }
 
   .modal-actions button:first-child {

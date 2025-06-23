@@ -35,7 +35,7 @@
     {#each filteredProducts as product (product.id)}
       <div class="product-card" on:click={() => selectProduct(product)}>
         <h3>{product.name}</h3>
-        <p class="product-price">${product.price.toFixed(2)}</p>
+        <p class="product-price">{product.price.toFixed(2)}Da</p>
         <p class="product-stock">Stock: {product.stock}</p>
       </div>
     {:else}
@@ -71,7 +71,7 @@
     border-radius: 40px;
     font-size: 1rem;
     box-sizing: border-box;
-    font-family: 'goia display regular';
+    font-family: 'boya';
     background: rgb(44, 44, 44, 0.5);
     backdrop-filter: blur(10px) saturate(180%);
     -webkit-backdrop-filter: blur(10px) saturate(180%);
@@ -80,7 +80,7 @@
   }
   .search-bar::placeholder {
     color: #ffffff;
-    font-family: 'goia display regular';
+    font-family: 'boya';
   }
 
   

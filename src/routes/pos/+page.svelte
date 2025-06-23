@@ -139,7 +139,7 @@
           const totalPaid = salesTransaction.total_paid;
           const subtotal = itemsToCheckout.reduce((sum, item) => sum + (item.price * item.quantity), 0);
           // Assuming taxes were applied to reach totalPaid, or you re-calculate them here if needed for receipt breakdown
-          const taxes = totalPaid - subtotal; // This assumes totalPaid already includes taxes from Rust side
+          const taxes = 0; // This assumes totalPaid already includes taxes from Rust side
 
           // For a real POS, tenderAmount would come from a payment input (e.g., cash tendered)
           // For now, let's assume tender_amount equals total_paid (exact change) for simplicity
@@ -153,8 +153,7 @@
               receipt_header: storeSettings.receipt_header,
               receipt_footer: storeSettings.receipt_footer,
               items: receiptItems,
-              subtotal: subtotal,
-              total_paid: totalPaid,
+              total_paid: subtotal,
               tender_amount: tenderAmount,
               change_due: changeDue,
               transaction_id: salesTransaction.id,

@@ -123,7 +123,7 @@ async function loadReportsData() {
           <div class="transaction-card product-card">
             <h3>ID: {transaction.id}</h3>
             <p class="transaction-date">Date: {transaction.date}</p>
-            <p class="transaction-total">Total: ${transaction.total_paid.toFixed(2)}</p>
+            <p class="transaction-total">Total: {transaction.total_paid.toFixed(2)}Da</p>
             </div>
         {:else}
           <p class="no-results">No transactions found, bestie! 😩</p>
@@ -136,15 +136,15 @@ async function loadReportsData() {
       <div class="revenue-cards-grid">
         <div class="revenue-card">
           <h3>Daily Revenue</h3>
-          <p class="revenue-amount">${dailyRevenue.toFixed(2)}</p>
+          <p class="revenue-amount">{dailyRevenue.toFixed(2)}Da</p>
         </div>
         <div class="revenue-card">
           <h3>Weekly Revenue</h3>
-          <p class="revenue-amount">${weeklyRevenue.toFixed(2)}</p>
+          <p class="revenue-amount">{weeklyRevenue.toFixed(2)}Da</p>
         </div>
         <div class="revenue-card">
           <h3>Monthly Revenue</h3>
-          <p class="revenue-amount">${monthlyRevenue.toFixed(2)}</p>
+          <p class="revenue-amount">{monthlyRevenue.toFixed(2)}Da</p>
         </div>
         </div>
     </section>
@@ -263,7 +263,7 @@ async function loadReportsData() {
     border-radius: 40px;
     font-size: 1rem;
     box-sizing: border-box;
-    font-family: 'goia display regular'; /* Added sans-serif fallback */
+    font-family: 'boya'; /* Added sans-serif fallback */
     background-color: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.092); /* Base border */
     color: #fff;
@@ -273,7 +273,7 @@ async function loadReportsData() {
 
   .search-bar::placeholder {
     color: rgba(255, 255, 255, 0.5);
-    font-family: 'goia display regular';
+    font-family: 'boya';
   }
 
   .search-bar:focus {
